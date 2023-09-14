@@ -19,23 +19,32 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: quotesList.map((e) {
-          QuotesModel quotesModel=QuotesModel.fromMap(e);
-          List<Color> color=quotesModel.colors?.map((e) {
-            int? c= int.tryParse("0xff$e");
+          QuotesModel quotesModel = QuotesModel.fromMap(e);
 
-            return Color(c??0xffffffff);
-          }).toList()??[];
-
-
-          return Container(
-            margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: color
-              )
+          List<Color> color = quotesModel.colors?.map((e) {
+                int? c = int.tryParse("0xff$e");
+                return Color(c ?? 0xffffffff);
+              }).toList() ??
+              [];
+          return InkWell(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("Quotes"),
+                    backgroundColor: color.first,
+                    content: Text(quotesModel.quotes ?? ""),
+                  );
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(gradient: LinearGradient(colors: color)),
+              child: Text(quotesModel.quotes ?? ""),
             ),
-            child: Text(quotesModel.quotes??""),
           );
         }).toList(),
       ),
