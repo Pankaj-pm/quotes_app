@@ -12,96 +12,147 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isGrid = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Quotes"),
         centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {
+                isGrid = !isGrid;
+                setState(() {});
+              },
+              icon: Icon(Icons.grid_on)),
+        ],
       ),
-      // body: Column(
-      //   children: quotesList.map((e) {
-      //     QuotesModel quotesModel = QuotesModel.fromMap(e);
-      //
-      //     List<Color> color = quotesModel.colors?.map((e) {
-      //           int? c = int.tryParse("0xff$e");
-      //           return Color(c ?? 0xffffffff);
-      //         }).toList() ??
-      //         [];
-      //
-      //     return InkWell(
-      //       onTap: () {
-      //         showMyDialog(quotesModel);
-      //       },
-      //       child: Container(
-      //         margin: EdgeInsets.all(10),
-      //         padding: EdgeInsets.all(10),
-      //         decoration: BoxDecoration(gradient: LinearGradient(colors: color)),
-      //         child: Text(quotesModel.quotes ?? ""),
-      //       ),
-      //     );
-      //   }).toList(),
-      // ),
+      body: isGrid
+          ? Scrollbar(
+              thickness: 50,
+              radius: Radius.circular(10),
+              trackVisibility: true,
+              child: GridView.builder(
+                itemCount: quotesList.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                itemBuilder: (context, index) {
+                  Map qt = quotesList[index];
+                  var quotesModel = QuotesModel.fromMap(qt);
+                  List<Color> color = quotesModel.colors?.map((e) {
+                        int? c = int.tryParse("0xff$e");
+                        return Color(c ?? 0xffffffff);
+                      }).toList() ??
+                      [];
+                  return InkWell(
+                    onTap: () {
+                      showMyDialog(quotesModel);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(gradient: LinearGradient(colors: color)),
+                      child: Text(quotesModel.quotes ?? ""),
+                    ),
+                  );
+                },
+              ),
+            )
+          : ListView.separated(
+              itemBuilder: (context, index) {
+                Map qt = quotesList[index];
+                var quotesModel = QuotesModel.fromMap(qt);
+                List<Color> color = quotesModel.colors?.map((e) {
+                      int? c = int.tryParse("0xff$e");
+                      return Color(c ?? 0xffffffff);
+                    }).toList() ??
+                    [];
+                return InkWell(
+                  onTap: () {
+                    showMyDialog(quotesModel);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(gradient: LinearGradient(colors: color)),
+                    child: Text(quotesModel.quotes ?? ""),
+                  ),
+                );
+              },
+              separatorBuilder: (context, index) {
+                return Divider(
+                  thickness: 5,
+                );
+              },
+              itemCount: quotesList.length),
 
-      /// simple List View
-      // body: ListView(
-      //   padding: EdgeInsets.symmetric(vertical: 20),
-      //   // scrollDirection: Axis.vertical,
-      //   // reverse: true,
-      //   // physics: BouncingScrollPhysics(),
-      //   children: [
-      //     //.... List of Widget
-      //   ],
-      // ),
-
-      /// ListView builder name constructor
-      // body: ListView.builder(
+      /*body: GridView.count(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        padding: EdgeInsets.all(10),
+        reverse: true,
+        children: [
+          Container(
+            color: Colors.red,
+          ),
+          Container(
+            color: Colors.green,
+          ),
+          Container(
+            color: Colors.blue,
+          ),
+          Container(
+            color: Colors.yellow,
+          ),
+          Container(
+            color: Colors.cyan,
+          ),
+          Container(
+            color: Colors.greenAccent,
+          ),
+        ],
+      ),*/
+      // body: GridView.builder(
+      //   // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      //   //   crossAxisCount: 5,
+      //   //   mainAxisSpacing: 2,
+      //   //   crossAxisSpacing: 2,
+      //   //   // mainAxisExtent: 50,
+      //   //   // childAspectRatio: 0.5
+      //   // ),
+      //   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      //     maxCrossAxisExtent: 50,
+      //     crossAxisSpacing: 2,
+      //     mainAxisSpacing: 2
+      //   ),
       //   itemBuilder: (context, index) {
-      //     QuotesModel quotesModel = QuotesModel.fromMap(quotesList[index]);
-      //     List<Color> color = quotesModel.colors?.map((e) {
-      //       int? c = int.tryParse("0xff$e");
-      //       return Color(c ?? 0xffffffff);
-      //     }).toList() ??
-      //         [];
-      //
-      //     return InkWell(
-      //       onTap: () {
-      //         showMyDialog(quotesModel);
-      //       },
-      //       child: Container(
-      //         margin: EdgeInsets.all(10),
-      //         padding: EdgeInsets.all(10),
-      //         decoration: BoxDecoration(gradient: LinearGradient(colors: color)),
-      //         child: Text(quotesModel.quotes ?? ""),
-      //       ),
+      //     bool isOddEven=index%2==0;
+      //     return LayoutBuilder(
+      //       builder: (context,box) {
+      //         print("maxWidth ${box.maxWidth}");
+      //         print("minWidth ${box.minWidth}");
+      //         return Container(
+      //           color: isOddEven?Colors.black12 :Colors.white,
+      //           child: Text("${index+1}"),
+      //         );
+      //       }
       //     );
       //   },
-      //   itemCount: quotesList.length,
+      //   itemCount: 100,
+      //   physics: BouncingScrollPhysics(),
       // ),
-
-      /// ListView separated name constructor
-      body: ListView.separated(
-          itemBuilder: (context, index) {
-            Map qt = quotesList[index];
-            var quotesModel = QuotesModel.fromMap(qt);
-
-            return Text(quotesModel.quotes ?? "");
-          },
-          separatorBuilder: (context, index) {
-            return Divider(
-              thickness: 5,
-            );
-          },
-          itemCount: quotesList.length),
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          var nextInt = Random().nextInt(6);
-          Map qt = quotesList[nextInt];
-          QuotesModel quotesModel = QuotesModel.fromMap(qt);
-
-          showMyDialog(quotesModel);
-          print(nextInt);
+          // var nextInt = Random().nextInt(6);
+          // Map qt = quotesList[nextInt];
+          // QuotesModel quotesModel = QuotesModel.fromMap(qt);
+          //
+          // showMyDialog(quotesModel);
+          print("Size => ${MediaQuery.of(context).size}");
+          // print(nextInt);
         },
         child: Icon(Icons.refresh),
       ),
