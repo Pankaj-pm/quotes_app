@@ -151,8 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
           // QuotesModel quotesModel = QuotesModel.fromMap(qt);
           //
           // showMyDialog(quotesModel);
-          print("Size => ${MediaQuery.of(context).size}");
-          // print(nextInt);
+          Navigator.pushNamed(context, "quotesPage");
+
         },
         child: Icon(Icons.refresh),
       ),

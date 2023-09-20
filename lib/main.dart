@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quotes_app/views/home_screen.dart';
+import 'package:quotes_app/views/quotes_detail.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +18,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      // home: HomeScreen(),
+      routes: {
+        "/":(context) => HomeScreen(),
+        "quotesPage":(context) => QuotesDetail(),
+      },
     );
   }
 }
