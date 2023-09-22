@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class QuotesDetail extends StatefulWidget {
@@ -43,6 +44,10 @@ class _QuotesDetailState extends State<QuotesDetail> {
   String text = "";
   double textSize = 12;
   bool isBold = false;
+  Alignment textTopPos = Alignment(0.5, 0.5);
+  double sliderVal = 0;
+
+  TextEditingController controller=TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +63,13 @@ class _QuotesDetailState extends State<QuotesDetail> {
                 text = "";
                 textSize = 12;
                 isBold = false;
+                controller.clear();
                 setState(() {});
               },
               icon: Icon(Icons.refresh)),
         ],
       ),
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -77,8 +83,9 @@ class _QuotesDetailState extends State<QuotesDetail> {
                     Positioned.fill(
                       child: Image.asset(img[iIndex!], fit: BoxFit.cover),
                     ),
-                  Center(
-                    child: Text(
+                  Align(
+                    alignment: textTopPos,
+                    child: SelectableText(
                       text,
                       style: fonts[fIndex].copyWith(
                           color: colors[cIndex],
@@ -91,15 +98,38 @@ class _QuotesDetailState extends State<QuotesDetail> {
               ),
             ),
           ),
-          TextField(
-            decoration: InputDecoration(
-              hintText: "Enter Text",
-              fillColor: Colors.grey,
-              filled: true,
-              // border: OutlineInputBorder.none
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    hintText: "Enter Text",
+                    fillColor: Colors.grey,
+                    filled: true,
+                    // border: OutlineInputBorder.none
+                  ),
+                  onChanged: (value) {
+                    text = value;
+                    setState(() {});
+                  },
+                ),
+              ),
+              IconButton(onPressed: () async{
+                var data = await Clipboard.getData("text/plain");
+                controller.text=data?.text??"";
+                print(data?.text);
+              }, icon: Icon(Icons.paste))
+            ],
+          ),
+          Slider(
+            value: sliderVal,
+            min: -1,
+            max: 1,
             onChanged: (value) {
-              text = value;
+              sliderVal = value;
+              textTopPos=Alignment(value,0.5);
               setState(() {});
             },
           ),

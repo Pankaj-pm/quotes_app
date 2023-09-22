@@ -1,6 +1,6 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quotes_app/model/quotes_model.dart';
 import 'package:quotes_app/util.dart';
 
@@ -76,7 +76,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: EdgeInsets.all(10),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(gradient: LinearGradient(colors: color)),
-                    child: Text(quotesModel.quotes ?? ""),
+                    child: Column(
+                      children: [
+                        IconButton(
+                            onPressed: () async {
+                              print("${quotesModel.quotes}");
+                              await Clipboard.setData(ClipboardData(text: quotesModel.quotes));
+
+                              print("Copy ${Clipboard.kTextPlain}");
+                              var data = await Clipboard.getData(Clipboard.kTextPlain);
+                              // ClipboardManager
+                              print(data?.text);
+                            },
+                            icon: Icon(Icons.copy)),
+                        Text(quotesModel.quotes ?? ""),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -152,7 +167,6 @@ class _HomeScreenState extends State<HomeScreen> {
           //
           // showMyDialog(quotesModel);
           Navigator.pushNamed(context, "quotesPage");
-
         },
         child: Icon(Icons.refresh),
       ),
