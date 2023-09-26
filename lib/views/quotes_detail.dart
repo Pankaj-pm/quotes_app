@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 
 class QuotesDetail extends StatefulWidget {
   const QuotesDetail({Key? key}) : super(key: key);
@@ -47,7 +52,9 @@ class _QuotesDetailState extends State<QuotesDetail> {
   Alignment textTopPos = Alignment(0.5, 0.5);
   double sliderVal = 0;
 
-  TextEditingController controller=TextEditingController();
+  TextEditingController controller = TextEditingController();
+  GlobalKey key = GlobalKey();
+  Uint8List? asUint8List;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +74,27 @@ class _QuotesDetailState extends State<QuotesDetail> {
                 setState(() {});
               },
               icon: Icon(Icons.refresh)),
+          IconButton(
+              onPressed: () async {
+                // To get byte data
+                RenderRepaintBoundary renderObject = key.currentContext?.findRenderObject() as RenderRepaintBoundary;
+                var image = await renderObject.toImage();
+                ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+                asUint8List = byteData?.buffer.asUint8List();
+
+                /// To save file
+                var applicationDocumentsDirectory = await getApplicationDocumentsDirectory();
+                var date = DateTime.now().toString();
+                String filePath = "${applicationDocumentsDirectory.path}/${date}_img.jpg";
+                File file = File(filePath);
+                await file.writeAsBytes(asUint8List?.toList() ?? []);
+                setState(() {
+
+                });
+
+                print("Downlaod");
+              },
+              icon: Icon(Icons.download)),
         ],
       ),
       // resizeToAvoidBottomInset: false,
@@ -75,29 +103,34 @@ class _QuotesDetailState extends State<QuotesDetail> {
         children: [
           Expanded(
             flex: 4,
-            child: Container(
-              color: Colors.black12,
-              child: Stack(
-                children: [
-                  if (iIndex != null)
-                    Positioned.fill(
-                      child: Image.asset(img[iIndex!], fit: BoxFit.cover),
+            child: RepaintBoundary(
+              key: key,
+              child: Container(
+                color: Colors.black12,
+                child: Stack(
+                  children: [
+                    if (iIndex != null)
+                      Positioned.fill(
+                        child: Image.asset(img[iIndex!], fit: BoxFit.cover),
+                      ),
+                    Align(
+                      alignment: textTopPos,
+                      child: SelectableText(
+                        text,
+                        style: fonts[fIndex].copyWith(
+                            color: colors[cIndex],
+                            fontSize: textSize,
+
+                            fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+                        // style: TextStyle(fontFamily: "Schyler",fontSize: textSize,fontWeight: isBold ? FontWeight.bold:FontWeight.normal),
+                      ),
                     ),
-                  Align(
-                    alignment: textTopPos,
-                    child: SelectableText(
-                      text,
-                      style: fonts[fIndex].copyWith(
-                          color: colors[cIndex],
-                          fontSize: textSize,
-                          fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
-                      // style: TextStyle(fontFamily: "Schyler",fontSize: textSize,fontWeight: isBold ? FontWeight.bold:FontWeight.normal),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+          if (asUint8List != null) Image.memory(asUint8List!,height: 50,width: 50),
           Row(
             children: [
               Expanded(
@@ -116,11 +149,13 @@ class _QuotesDetailState extends State<QuotesDetail> {
                   },
                 ),
               ),
-              IconButton(onPressed: () async{
-                var data = await Clipboard.getData("text/plain");
-                controller.text=data?.text??"";
-                print(data?.text);
-              }, icon: Icon(Icons.paste))
+              IconButton(
+                  onPressed: () async {
+                    var data = await Clipboard.getData("text/plain");
+                    controller.text = data?.text ?? "";
+                    print(data?.text);
+                  },
+                  icon: Icon(Icons.paste))
             ],
           ),
           Slider(
@@ -129,7 +164,7 @@ class _QuotesDetailState extends State<QuotesDetail> {
             max: 1,
             onChanged: (value) {
               sliderVal = value;
-              textTopPos=Alignment(value,0.5);
+              textTopPos = Alignment(value, 0.5);
               setState(() {});
             },
           ),
